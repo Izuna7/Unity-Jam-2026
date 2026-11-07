@@ -1,8 +1,8 @@
+using DG.Tweening;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using NUnit.Framework;
-using System.Collections.Generic;
 
 public class Cauldron : MonoBehaviour
 {
@@ -15,12 +15,19 @@ public class Cauldron : MonoBehaviour
     [Header("UI")]
     public Image valueBar;
     public TextMeshProUGUI barText;
+    public GameObject playerScoreUI;
+    public GameObject clientScoreUI;
 
+    float originalScoreY;
+
+    private Sequence compareSequence;
 
     void Start()
     {
         UpdateUI();
         StartNewLevel();
+
+        originalScoreY = playerScoreUI.transform.position.y;
     }
 
  
@@ -36,12 +43,12 @@ public class Cauldron : MonoBehaviour
 
        if(playerRecipeValue > luckyNumber)
        {
-           valueBar.color = Color.red;
+         //  valueBar.color = Color.red;
            
        }
        else
        {
-           valueBar.color = Color.rebeccaPurple;
+         //  valueBar.color = Color.rebeccaPurple;
        }
     }
 
@@ -73,7 +80,42 @@ public class Cauldron : MonoBehaviour
         {
             Debug.Log("You lose! Your recipe value is less than enemy recipe value.");
         }
+
+
+        PopupCompareUI();
     }
 
-    
+    private void PopupCompareUI()
+    {
+        // Kill previous animation if still running
+        compareSequence?.Kill();
+
+        compareSequence = DOTween.Sequence();
+
+        // Player score popup
+        compareSequence.Append(playerScoreUI.transform.DOLocalMoveY(0f, 0.3f)
+            .SetEase(Ease.OutBack));
+
+        compareSequence.Join(playerScoreUI.transform.DOScale(
+            new Vector3(0.75f, 0.75f, 1f), 0.15f));
+
+        compareSequence.Append(playerScoreUI.transform.DOScale(
+            new Vector3(0.85f, 1.15f, 1f), 0.12f));
+
+        compareSequence.Append(playerScoreUI.transform.DOScale(Vector3.one, 0.15f));
+
+        compareSequence.AppendInterval(1f);
+
+        // Client score popup
+        compareSequence.Append(clientScoreUI.transform.DOLocalMoveY(0f, 0.3f)
+            .SetEase(Ease.OutBack));
+
+        compareSequence.Join(clientScoreUI.transform.DOScale(
+            new Vector3(0.75f, 0.75f, 1f), 0.15f));
+
+        compareSequence.Append(clientScoreUI.transform.DOScale(
+            new Vector3(0.85f, 1.15f, 1f), 0.12f));
+
+        compareSequence.Append(clientScoreUI.transform.DOScale(Vector3.one, 0.15f));
+    }
 }
