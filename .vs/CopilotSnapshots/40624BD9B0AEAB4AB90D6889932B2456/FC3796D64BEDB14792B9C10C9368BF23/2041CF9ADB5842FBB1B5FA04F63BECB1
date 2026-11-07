@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections;
+using TMPro;
+using UnityEngine;
+
+public class DialogueUI : MonoBehaviour
+{
+    public DialogueManager dialogueManager; // Reference to the DialogueManager
+    public TextMeshProUGUI characterNameText; // Reference to the TextMeshProUGUI for character name
+    public TextMeshProUGUI dialogueText; // Reference to the TextMeshProUGUI for dialogue text
+    [SerializeField] private float typingSpeed = 0.05f; // Speed at which the dialogue text is typed out
+    private Coroutine typingCoroutine;
+    private void Start()
+    {
+        if (dialogueManager != null)
+        {
+            dialogueManager.onDialogueStart.AddListener(UpdateDialogueUI);
+        }
+    }
+    private void UpdateDialogueUI(DialogueSO dialogue)
+    {
+        if (dialogue != null)
+        {
+            characterNameText.text = dialogue.characterName;
+            if (typingCoroutine != null)
+            {
+                StopCoroutine(typingCoroutine);
+            }
+            typingCoroutine = StartCoroutine(TypeDialogue(dialogue.dialogue));
+        }
+    }
+
+    private IEnumerator TypeDialogue(string text)
+    {
+        dialogueText.text = text;
+        dialogueText.maxVisibleCharacters = 0;
+        for (int i = 1; i <= text.Length; i++)
+        {
+            dialogueText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+        typingCoroutine = null;
+    }
+
+}

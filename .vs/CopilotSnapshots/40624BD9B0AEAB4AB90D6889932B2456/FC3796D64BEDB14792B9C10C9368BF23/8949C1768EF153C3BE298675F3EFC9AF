@@ -1,0 +1,27 @@
+﻿using System;
+using TMPro;
+using UnityEngine;
+
+public class DialogueUI : MonoBehaviour
+{
+    public DialogueManager dialogueManager; // Reference to the DialogueManager
+    public TextMeshProUGUI characterNameText; // Reference to the TextMeshProUGUI for character name
+    public TextMeshProUGUI dialogueText; // Reference to the TextMeshProUGUI for dialogue text
+    [SerializeField] private float typingSpeed = 0.05f; // Speed at which the dialogue text is typed out
+    private void Start()
+    {
+        if (dialogueManager != null)
+        {
+            dialogueManager.onDialogueStart.AddListener(UpdateDialogueUI);
+        }
+    }
+    private void UpdateDialogueUI(DialogueSO dialogue)
+    {
+        if (dialogue != null)
+        {
+            characterNameText.text = dialogue.characterName;
+            dialogueText.text = dialogue.dialogue;
+        }
+    }
+
+}
