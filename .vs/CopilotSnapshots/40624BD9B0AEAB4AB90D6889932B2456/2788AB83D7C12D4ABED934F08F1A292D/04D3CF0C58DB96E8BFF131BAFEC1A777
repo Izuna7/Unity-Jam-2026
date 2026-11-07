@@ -1,0 +1,64 @@
+﻿using DG.Tweening;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
+
+public class DialogueManager : MonoBehaviour
+{
+    public DialogueSO currentDialogue; // Reference to the current dialogue scriptable object
+    public DialogueUI dialogueUI; // Reference to the DialogueUI component
+    public UnityEvent<DialogueSO> onDialogueStart; // Event triggered when dialogue starts
+
+
+    bool isDialogueActive = false; // Flag to check if dialogue is active
+    private void Start()
+    {
+        if (dialogueUI != null)
+        {
+            dialogueUI.transform.localScale = Vector3.zero;
+            dialogueUI.gameObject.SetActive(false); // Hide the dialogue UI at the start
+        }
+    }
+    public void PlayDialogue(DialogueSO dialogue) // Method to play a dialogue
+    {
+        currentDialogue = dialogue;
+        onDialogueStart.Invoke(currentDialogue);
+        DisplayDialogue();
+        SetActive(true); // Show the dialogue UI when a dialogue starts
+        isDialogueActive = true; // Set the dialogue active flag to true
+    }
+    private void DisplayDialogue()
+    {
+        // Display the character name and dialogue text
+        Debug.Log($"Character: {currentDialogue.characterName}");
+        Debug.Log($"Dialogue: {currentDialogue.dialogue}");
+        // Optionally, display the character image and play the voice clip
+        if (currentDialogue.characterImage != null)
+        {
+            // Display the character image in your UI
+            Debug.Log("Displaying character image.");
+        }
+        if (currentDialogue.voiceClip != null)
+        {
+            // Play the voice clip
+            Debug.Log("Playing voice clip.");
+        }
+    }
+    public void SetActive(bool isActive) // Method to set the dialogue manager active or inactive
+    {
+        dialogueUI.transform.DOScale(isActive ? Vector3.one : Vector3.zero, 0.5f).SetEase(Ease.InOutSine);
+        dialogueUI.gameObject.SetActive(isActive);
+    }
+
+    private void Update()
+    {
+        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            PlayDialogue(currentDialogue); // Play the current dialogue when the space key is pressed
+        }
+        if(Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            SetActive(false); // Hide the dialogue UI when the escape key is pressed
+        }   
+    }
+}

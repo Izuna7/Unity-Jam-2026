@@ -1,0 +1,90 @@
+﻿using DG.Tweening;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
+
+public class DialogueManager : MonoBehaviour
+{
+    public DialogueSO currentDialogue; // Reference to the current dialogue scriptable object
+    public DialogueUI dialogueUI; // Reference to the DialogueUI component
+    public UnityEvent<DialogueSO> onDialogueStart; // Event triggered when dialogue starts
+
+    private bool isDialogueActive = false; // Flag to check if dialogue is active
+    private void Start()
+    {
+        if (dialogueUI != null)
+        {
+            dialogueUI.transform.localScale = Vector3.zero;
+            dialogueUI.gameObject.SetActive(false); // Hide the dialogue UI at the start
+        }
+    }
+    public void PlayDialogue(DialogueSO dialogue) // Method to play a dialogue
+    {
+        if (isDialogueActive)
+        {
+            return; // If a dialogue is already active, do not start a new one
+        }
+        currentDialogue = dialogue;
+        dialogueUI.UpdateDialogueUI(currentDialogue);
+        onDialogueStart.Invoke(currentDialogue);
+        DisplayDialogue();
+        Show(); // Show the dialogue UI when a dialogue starts
+        isDialogueActive = true;
+    }
+    private void DisplayDialogue()
+    {
+        // Display the character name and dialogue text
+        Debug.Log($"Character: {currentDialogue.characterName}");
+        Debug.Log($"Dialogue: {currentDialogue.dialogue}");
+        // Optionally, display the character image and play the voice clip
+        if (currentDialogue.characterImage != null)
+        {
+            // Display the character image in your UI
+            Debug.Log("Displaying character image.");
+        }
+        if (currentDialogue.voiceClip != null)
+        {
+            // Play the voice clip
+            Debug.Log("Playing voice clip.");
+        }
+    }
+    public void Show() // Method to show the dialogue UI
+    {
+        dialogueUI.transform.DOKill();
+        dialogueUI.gameObject.SetActive(true);
+        dialogueUI.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.InOutSine).OnComplete(dialogueUI.StartTyping);
+    }
+    public void Hide()
+    {
+        if (dialogueUI.IsTyping)
+        {
+            return;
+        }
+        isDialogueActive = false;
+        dialogueUI.transform.DOKill();
+        dialogueUI.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InOutSine).OnComplete(() =>
+        {
+            dialogueUI.ClearDialogue();
+            dialogueUI.gameObject.SetActive(false);
+        });
+    }
+
+    private void Update()
+    {
+        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            PlayDialogue(currentDialogue); // Play the current dialogue when the space key is pressed
+        }
+        if(Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            if (dialogueUI.IsTyping)
+            {
+                dialogueUI.SkipTyping(); 
+            }
+            else
+            {
+                Hide();
+            }
+        }   
+    }
+}
