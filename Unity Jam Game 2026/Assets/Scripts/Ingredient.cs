@@ -6,5 +6,6 @@ public class Ingredient : ScriptableObject
     public string ingredientName;
     public string ingredientDescription;
     public Sprite ingredientSprite;
-    public int ingredientValue;
+    public int ingredientMinValue;
+    public int ingredientMaxValue;
 }
