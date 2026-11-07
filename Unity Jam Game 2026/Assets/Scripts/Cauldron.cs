@@ -16,7 +16,9 @@ public class Cauldron : MonoBehaviour
     public Image valueBar;
     public TextMeshProUGUI barText;
     public GameObject playerScoreUI;
+    public TextMeshProUGUI playerScoreText;
     public GameObject clientScoreUI;
+    public TextMeshProUGUI clientScoreText;
 
     float originalScoreY;
 
@@ -81,7 +83,8 @@ public class Cauldron : MonoBehaviour
             Debug.Log("You lose! Your recipe value is less than enemy recipe value.");
         }
 
-
+        playerScoreText.text = playerRecipeValue + " / " + luckyNumber;
+        clientScoreText.text = enemyRecipeValue + " / " + luckyNumber;
         PopupCompareUI();
     }
 
